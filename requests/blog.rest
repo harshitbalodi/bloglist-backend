@@ -3,11 +3,15 @@ GET http://localhost:3001/api/blogs
 ###
 POST http://localhost:3001/api/blogs HTTP/1.1
 content-Type:application/json
+Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.amFuYXI.xtpSfB_kUK005dltjFH-S9-G7l4ZteK9D9vkqWwtokE"
 
 {
-    "title":"kd campus revolution",
-    "author":"Vikas Divyakirti",
-    "url":"https://www.avadhojha.com",
-    "likes":-1,
+    "title":"Pt. jawahar lal Nehru ",
+    "author":"Indra Gandhi",
+    "url":"https://www.Blurstar.com",
+    "likes":1984,
     "userId":"65b7ecf26ec7916b3bc29d0e"
 }
+
+###
+DELETE http://localhost:3001/api/blogs/098765567890 HTTP/1.1

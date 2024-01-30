@@ -7,7 +7,7 @@ const usersRouter = require('./controllers/user');
 const loginRouter = require('./controllers/login');
 const {MONGO_URI, TEST_MONGO_URI} = require('./utils/config');
 const {info, error} = require('./utils/loggers');
-const {unknownEndpoint, errorHandler, tokenExtracter} = require('./utils/middleware');
+const {unknownEndpoint, errorHandler, tokenExtracter, userExtracter} = require('./utils/middleware');
 require('dotenv').config();
 require('express-async-errors');
 
@@ -24,9 +24,9 @@ app.use(express.json())
 app.use(tokenExtracter)
 
 //api Routes
-app.use('/api/blogs', blogsRouter);
-app.use('/api/users', usersRouter);
-app.use('/api/login', loginRouter);
+app.use('/api/blogs',userExtracter, blogsRouter);
+app.use('/api/users',usersRouter);
+app.use('/api/login' , loginRouter);
 
 app.use(unknownEndpoint);
 app.use(errorHandler);
