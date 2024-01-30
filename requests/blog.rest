@@ -1,0 +1,13 @@
+GET http://localhost:3001/api/blogs
+
+###
+POST http://localhost:3001/api/blogs HTTP/1.1
+content-Type:application/json
+
+{
+    "title":"kd campus revolution",
+    "author":"Vikas Divyakirti",
+    "url":"https://www.avadhojha.com",
+    "likes":-1,
+    "userId":"65b7ecf26ec7916b3bc29d0e"
+}
