@@ -27,7 +27,7 @@ const userExtracter = (request, response, next) => {
   const token = request.Authorization;
 
   if (token === null) {
-    if(request.method === 'GET') return next();
+    if(request.method === 'GET' )  return next();
     return response.status(401).json({error:"token is not provided with the request"})
   }
   try {

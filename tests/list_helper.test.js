@@ -1,5 +1,6 @@
 const { dummy, totalLikes, favouriteBlog } = require("../utils/list_helper");
 const { blogs } = require("../utils/constants");
+const { mostBlogs, mostLikes} = require('../utils/lodash_helper_fn');
 
 describe("Helper", () => {
   test("dummy returns one", () => {
@@ -26,3 +27,22 @@ describe("Helper", () => {
     });
   });
 });
+
+describe('most likes and most blogs',()=>{
+  test('author with most likes', ()=>{
+    const result = mostLikes(blogs)
+    expect(result).toEqual({
+      "author": "Edsger W. Dijkstra",  
+       "likes": 17,
+    })
+  })
+
+  test('author with most Blogs', ()=>{
+    const result = mostBlogs(blogs)
+    expect(result).toEqual({
+      "author": "Robert C. Martin",    
+       "blogs": 3
+    })
+    
+  })
+})

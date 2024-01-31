@@ -15,3 +15,4 @@ Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9.amFuYXI.xtpSfB_kUK005dltjFH-S9-G7l4Z
 
 ###
 DELETE http://localhost:3001/api/blogs/098765567890 HTTP/1.1
+

@@ -6,14 +6,19 @@ const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const {userExtracter} = require('../utils/middleware');
 
-blogsRouter.get("/", async (request, response) => {
-  const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
+blogsRouter.get("/", async (request, response, next)  => {
+  try{
+    const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
 
   response.status(200).json(blogs);
+  }catch(error){
+    next(error);
+  }
+  
 });
 
 
-blogsRouter.post("/",userExtracter, async (request, response) => {
+blogsRouter.post("/",userExtracter, async (request, response, next) => {
   try{
   const resObject = request.body;
   if (!resObject.url || !resObject.title) {
@@ -73,5 +78,19 @@ blogsRouter.delete("/:id", userExtracter, async (request, response, next) => {
     next(error);
   }
 });
+
+blogsRouter.put('/:id', async(request, response, next)=>{
+  try{
+    const id = request.params.id;
+    const updation = request.body;
+
+    const res = await Blog.findByIdAndUpdate(id, updation);
+
+    const blog =await  Blog.findById(id);
+    response.status(200).send(blog);
+  }catch(error){
+    next(error);
+  }
+})
 
 module.exports = blogsRouter;
