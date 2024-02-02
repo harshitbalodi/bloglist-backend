@@ -83,10 +83,10 @@ blogsRouter.put('/:id', async(request, response, next)=>{
   try{
     const id = request.params.id;
     const updation = request.body;
-
-    const res = await Blog.findByIdAndUpdate(id, updation);
-
-    const blog =await  Blog.findById(id);
+    const blog = await Blog.findById(id);
+    blog.likes = blog.likes+1;
+    await blog.save();
+    
     response.status(200).send(blog);
   }catch(error){
     next(error);
