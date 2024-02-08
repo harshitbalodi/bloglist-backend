@@ -15,28 +15,24 @@ usersRouter.post("/", async (request, response) => {
   ) {
     return response
       .status(401)
-      .json({ error: { message: "username and password are compulsory" } });
+      .send("username and password are compulsory");
   }
   if (request.body.username && request.body.username.length <= 3) {
     return response
       .status(401)
-      .json({
-        error: { message: "username should be more then 3 characters" },
-      });
+      .send( "username should be more then 3 characters");
   }
 
   if (request.body.password && request.body.password.length <= 3) {
     return response
       .status(401)
-      .json({
-        error: { message: "password should be more then 3 characters" },
-      });
+      .send("password should be more then 3 characters");
   }
   const username = request.body.username;
   const userExist = await User.findOne({username});
 
   if (userExist !== null)
-    return response.status(409).json({ error: "username is already taken!" });
+    return response.status(409).send("username is already taken!" );
 
   const saltRounds = 10;
   const newPassword = await bcrypt.hash(request.body.password, saltRounds);

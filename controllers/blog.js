@@ -4,58 +4,61 @@ const { info } = require("../utils/loggers");
 const User = require("../models/user");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
-const {userExtracter} = require('../utils/middleware');
+const { userExtracter } = require("../utils/middleware");
 
-blogsRouter.get("/", async (request, response, next)  => {
-  try{
-    const blogs = await Blog.find({}).populate("user", { username: 1, name: 1 });
+blogsRouter.get("/", async (request, response, next) => {
+  try {
+    const blogs = await Blog.find({}).populate("user", {
+      username: 1,
+      name: 1,
+    });
 
-  response.status(200).json(blogs);
-  }catch(error){
+    response.status(200).json(blogs);
+  } catch (error) {
     next(error);
   }
-  
 });
 
+blogsRouter.post("/", userExtracter, async (request, response, next) => {
+  try {
+    const resObject = request.body;
+    if (!resObject.url || !resObject.title) {
+      console.log(resObject);
+      return response
+        .status(400)
+        .send("url or title is missing in the request object");
+    }
 
-blogsRouter.post("/",userExtracter, async (request, response, next) => {
-  try{
-  const resObject = request.body;
-  if (!resObject.url || !resObject.title) {
-    console.log(resObject);
-    return response
-      .status(400)
-      .send({ error: "url or title is missing in the request object" });
+    info("user:", request.user);
+
+    const user = await User.findById(request.user.userId);
+    const blog = new Blog({
+      ...resObject,
+      user: user._id,
+    });
+
+    const result = await blog.save();
+    user.blogs = user.blogs.concat(result._id);
+    await user.save();
+    const blogObj = await Blog.findById(result._id).populate("user", {
+      username: 1,
+      name: 1,
+    });
+    info("Blog object",blogObj);
+    response.status(201).json(blogObj);
+  } catch (error) {
+    next(error);
   }
-  
-  info("user:", request.user);
-  
-  const user = await User.findById(request.user.userId);
-  const blog = new Blog({
-    ...resObject,
-    user: user._id
-  });
-
-  
-  const result = await blog.save();
-  user.blogs = user.blogs.concat(result._id);
-  await user.save();
-  info(result);
-  response.status(201).json(result);
-}catch(error){
-  next(error);
-}
 });
 
 blogsRouter.delete("/:id", userExtracter, async (request, response, next) => {
-  
   try {
     const id = request.params.id;
 
     const blog = await Blog.findById(new mongoose.Types.ObjectId(id));
     info("blog", blog);
     if (!blog) {
-      return response.status(404).json({ error: "Blog is already deleted" });
+      return response.status(404).send("Blog is already deleted");
     }
 
     const user = await User.findById(blog.user);
@@ -64,7 +67,7 @@ blogsRouter.delete("/:id", userExtracter, async (request, response, next) => {
     if (request.user.userId !== user.id) {
       return response
         .status(403)
-        .json({ error: "not a valid user to perform this operation" });
+        .send("not a valid user to perform this operation");
     }
 
     user.blogs = user.blogs.filter((blogId) => blogId.toString() !== id);
@@ -79,18 +82,20 @@ blogsRouter.delete("/:id", userExtracter, async (request, response, next) => {
   }
 });
 
-blogsRouter.put('/:id', async(request, response, next)=>{
-  try{
+blogsRouter.put("/:id", async (request, response, next) => {
+  try {
     const id = request.params.id;
-    const updation = request.body;
-    const blog = await Blog.findById(id);
-    blog.likes = blog.likes+1;
+    const blog = await Blog.findById(id).populate("user", {
+      username: 1,
+      name: 1,
+    });
+    blog.likes = blog.likes + 1;
     await blog.save();
-    
+
     response.status(200).send(blog);
-  }catch(error){
+  } catch (error) {
     next(error);
   }
-})
+});
 
 module.exports = blogsRouter;
