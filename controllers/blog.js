@@ -19,6 +19,20 @@ blogsRouter.get("/", async (request, response, next) => {
   }
 });
 
+blogsRouter.get("/:id/comments", async (request, response, next) => {
+  try {
+    const id = request.params.id;
+    console.log(id);
+    const blog = await Blog.findById(id);
+    console.log("This is blog", blog);
+    if (!blog) return response.status(404).send("not a valid blog id");
+    response.status(200).json(blog.comments);
+  } catch (error) {
+    console.log("error inside get comments", error);
+    next(error);
+  }
+});
+
 blogsRouter.post("/", userExtracter, async (request, response, next) => {
   try {
     const resObject = request.body;
@@ -44,17 +58,38 @@ blogsRouter.post("/", userExtracter, async (request, response, next) => {
       username: 1,
       name: 1,
     });
-    info("Blog object",blogObj);
+    info("Blog object", blogObj);
     response.status(201).json(blogObj);
   } catch (error) {
     next(error);
   }
 });
 
+blogsRouter.post(
+  "/:id/comments",
+  userExtracter,
+  async (request, response, next) => {
+    try {
+      console.log(request.body);
+      const { comment } = request.body;
+      const id = request.params.id;
+      const blog = await Blog.findById(id);
+      if (!blog) return response.status(404).send("invalid blog id");
+      blog.comments = blog.comments.concat(comment);
+      await Blog.findByIdAndUpdate(id,blog);
+      const newBlog =await Blog.findById(id);
+      console.log(newBlog);
+      return response.status(201).json(newBlog);
+    } catch (error) {
+      console.log(error);
+      next(error);
+    }
+  }
+);
+
 blogsRouter.delete("/:id", userExtracter, async (request, response, next) => {
   try {
     const id = request.params.id;
-
     const blog = await Blog.findById(new mongoose.Types.ObjectId(id));
     info("blog", blog);
     if (!blog) {
