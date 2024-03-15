@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 const unknownEndpoint = (req, res) => {
-  res.status(200);
+  res.status(404);
   const htmlFile = 'index.html';
   const filePath = path.join(__dirname, '../public',htmlFile);
   fs.access(filePath, fs.constants.F_OK, err=>{
