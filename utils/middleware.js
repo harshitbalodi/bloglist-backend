@@ -1,8 +1,26 @@
 const jwt = require('jsonwebtoken');
 const {info} = require('./loggers');
+const path = require('path');
+const fs = require('fs');
 
 const unknownEndpoint = (req, res) => {
-  res.status(404).send({ error: "Unknown Endpoint" });
+  res.status(200);
+  const htmlFile = 'index.html';
+  const filePath = path.join(__dirname, '../public',htmlFile);
+  fs.access(filePath, fs.constants.F_OK, err=>{
+    if(err){
+      console.log('Error accessing requested HTML file:',err);
+      return res.send({error:'unknown endpoint'});
+    }
+    fs.readFile(filePath, 'utf-8', (err, data)=>{
+      if(err){
+        console.log('Error reading HTML file:',err);
+        return res.send({error:'unknown endpoint'});
+      }
+      res.setHeader('Content-Type', 'text/html');
+      res.send(data);
+    })
+  })
 };
 
 const errorHandler = (error, req, res, next) => {

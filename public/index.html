@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        BlogList api endpoints
+    </title>
+</head>
+<body>
+    <h2>I welcome you to the bloglist api endpoints</h2>
+    Blog list provide 4 api endpoints
+    <ul>
+        <li>User</li>
+        <li>Login</li>
+        <li>Blog</li>
+        <li>test</li>
+    </ul>
+    <div>
+        <h3>User</h3>
+        <p>To create user send post request to <a href="http://favoriteblogs.onrender.com/api/users">api/users</a> with name, password and username, username should be of at least three characters</p>
+    </div>
+    <div>
+        <h3>Login</h3>
+        <p>For login send post request to <a href="http://favoriteblogs.onrender.com/api/login">api/login</a> with username and password </p>
+    </div>
+    <div>
+        <h3>Blog</h3>
+        <p>
+            for the point <a href="http://favoriteblogs.onrender.com/api/blogs">/api/blogs</a>
+        </p>
+        <Table>
+            <th>
+                request
+            </th>
+            <th>
+                endpoint
+            </th>
+            <th>
+                Purpose
+            </th>
+            <tr>
+                <td>
+                    GET
+                </td>
+                <td>
+                    <a href="http://favoriteblogs.onrender.com/api/blogs">/</a>
+                </td>
+                <td>
+                    return all the blogs in the database
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    GET
+                </td>
+                <td>
+                    <a href="http://favoriteblogs.onrender.com/api/blogs/:id/comments">/:id/comments</a>
+                </td>
+                <td>
+                    returns the comments on the particular blog'id id
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    POST
+                </td>
+                <td>
+                    <a href="http://favoriteblogs.onrender.com/api/blogs/">/</a>
+                </td>
+                <td>
+                    to add new blog, Only authorised user with bearer token can add blogs
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    POST
+                </td>
+                <td>
+                    <a href="http://favoriteblogs.onrender.com/api/blogs/:id/comments">/:id/comments</a>
+                </td>
+                <td>
+                    To comment on the blog,Only authorised user with bearer token can comment on the blog
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    DELETE
+                </td>
+                <td>
+                    <a href="http://favoriteblogs.onrender.com/api/blogs/:id">/:id</a>
+                </td>
+                <td>
+                    To delete the blog, Only authorised user with bearer token can delete there own blog.
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    PUT
+                </td>
+                <td>
+                    <a href="http://favoriteblogs.onrender.com/api/blogs/:id">/:id</a>
+                </td>
+                <td>
+                    To like the blog, any authorised user with bearer token can like the blog.
+                </td>
+            </tr>
+
+
+        </Table>
+    </div>
+    <div>
+        <h3>Test</h3>
+        <em>Note: This will only work when server is running on test mode</em>
+        <p>This will reset the testing database for new testing round, end point for reset is <a href="http://favoriteblogs.onrender.com/api/test/reset">api/test/reset</a></p>
+    </div>
+</body>
+</html>
