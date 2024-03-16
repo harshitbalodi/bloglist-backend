@@ -10,7 +10,7 @@ Bloglist backend application is developed using node and express, And tested wit
 
 ## Environment variables
 
-create a .env file in the root directory and create two databases, one for deployment and another for testing. Create a hash value using jwt and put in on SECRET variable which will be used in password hashing and jwt token.
+create a .env file in the root directory and create two databases, one for deployment and another for testing. Create a hash value using jwt and put in SECRET variable which will be used in password hashing and jwt token.
 
 >  MONGO_URI
 
