@@ -20,28 +20,28 @@ create a .env file in the root directory and create two databases, one for deplo
 
 > PORT
 
-### To run the application
-First clone the repo:
+## To run the application
+### First clone the repo:
 ```
 git clone https://github.com/harshitbalodi/bloglist-backend
 ```
-Go the app directory:
+### Go the app directory:
 ```
 cd bloglist-backend
 ```
-Install packages:
+### Install packages:
 ```
 npm install
 ```
-To run in dev environment (ensure you have defined environment variables):
+### To run in dev environment (ensure you have defined environment variables):
 ```
 npm run dev
 ```
-For jest testing:
+### For jest testing:
 ```
 npm run test
 ```
-For end-to-end testing
+### For end-to-end testing
 ```
 npm run start:test
 ```
