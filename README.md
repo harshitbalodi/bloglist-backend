@@ -20,7 +20,7 @@ create a .env file in the root directory and create two databases, one for deplo
 
 > PORT
 
-## To run the application
+## Installation and Setup
 ### First clone the repo:
 ```
 git clone https://github.com/harshitbalodi/bloglist-backend
