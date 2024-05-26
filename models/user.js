@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require('mongoose-unique-validator');
 const userSchema = mongoose.Schema({
-  username: {
+username: {
     minLength:3,
     type: String,
     required: true,
@@ -15,10 +15,20 @@ const userSchema = mongoose.Schema({
     type: String,
     required: true,
   },
+  image: {
+    type: String,
+  }
+  ,
   blogs:[
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Blog",
+    }
+  ],
+  friends:[
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     }
   ]
 });

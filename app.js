@@ -9,6 +9,8 @@ const testRouter = require('./controllers/test');
 const {MONGO_URI, TEST_MONGO_URI} = require('./utils/config');
 const {info, error} = require('./utils/loggers');
 const {unknownEndpoint, errorHandler, tokenExtracter, userExtracter} = require('./utils/middleware');
+const cookieParser = require('cookie-parser');
+
 require('dotenv').config();
 require('express-async-errors');
 
@@ -20,7 +22,14 @@ mongoose.connect(url).then(res=>{
     error(err);
 })
 
-app.use(cors())
+app.use(cors({
+    origin: [
+        'http://localhost:5173', 
+        'https://blog-repository-zeta.vercel.app'
+    ],
+    credentials: true
+}))
+app.use(cookieParser());
 app.use(express.json())
 app.use(tokenExtracter)
 

@@ -21,7 +21,39 @@ const blogSchema = new mongoose.Schema({
         ref:'User',
     },
     comments:[{
-        type:String,
+        user:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'User',
+        },
+        comment: {
+            type:String,
+            required:true,
+            minlength:3
+        },
+        replies: [{
+            user:{
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'User',
+            },
+            reply: {
+                type:String,
+                required:true,
+                minlength:3
+            },
+            nestedReplies:[
+                {
+                    user:{
+                        type:mongoose.Schema.Types.ObjectId,
+                        ref:'User',
+                    },
+                    reply: {
+                        type:String,
+                        required:true,
+                        minlength:3
+                    }
+                }
+            ]
+        }]
     }]
 })
   
