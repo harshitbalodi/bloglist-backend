@@ -1,15 +1,18 @@
 const mongoose = require("mongoose");
 const uniqueValidator = require('mongoose-unique-validator');
+
 const userSchema = mongoose.Schema({
-username: {
-    minLength:3,
+  username: {
     type: String,
-    required: true,
-    unique:true,
+    unique: true,
+    sparse: true, // Allow null values for unique field
+    minLength: 3,
   },
   hashedPassword: {
     type: String,
-    required: true,
+    required: function() {
+      return this.provider === 'local'; // Only required if user logs in locally
+    },
   },
   name: {
     type: String,
@@ -17,20 +20,29 @@ username: {
   },
   image: {
     type: String,
-  }
-  ,
-  blogs:[
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  provider: {
+    type: String,
+    enum: ["local", "google"],
+    required: true,
+  },
+  blogs: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Blog",
     }
   ],
-  friends:[
+  friends: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     }
-  ]
+  ],
 });
 
 userSchema.set("toJSON", {
@@ -41,6 +53,8 @@ userSchema.set("toJSON", {
     delete returnedObject.hashedPassword;
   },
 });
+
+userSchema.plugin(uniqueValidator);
 
 const User = mongoose.model('User', userSchema);
 
