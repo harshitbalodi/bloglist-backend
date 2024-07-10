@@ -43,6 +43,12 @@ const userSchema = mongoose.Schema({
       ref: "User",
     }
   ],
+  friendRequests: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    }
+  ],
 });
 
 userSchema.set("toJSON", {

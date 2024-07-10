@@ -59,34 +59,38 @@ AuthRouter.post("/login", async (request, response, next) => {
   }
 });
 
-AuthRouter.get("/refresh", async (request, response) => {
-  const refreshToken = request.cookies?.refreshToken;
-  console.log("cookie from request", request.cookies);
-  if (!refreshToken) {
-    return response
-      .status(401)
-      .json({ error: { message: "Refresh token is not provided" } });
-  }
-
-  jwt.verify(refreshToken, process.env.REFRESH_SECRET, (error, decoded) => {
-    if (error) {
-      return response.status(401).send("Refresh token is not valid");
+AuthRouter.get("/refresh", async (request, response, next) => {
+  try {
+    const refreshToken = request.cookies?.refreshToken;
+    console.log("cookie from request", request.cookies);
+    if (!refreshToken) {
+      return response
+        .status(401)
+        .json({ error: { message: "Refresh token is not provided" } });
     }
 
-    const accessToken = jwt.sign(
-      { username: decoded.username, userId: decoded.userId },
-      process.env.SECRET,
-      {
-        expiresIn: "1d",
+    jwt.verify(refreshToken, process.env.REFRESH_SECRET, (error, decoded) => {
+      if (error) {
+        return response.status(401).send("Refresh token is not valid");
       }
-    );
-    console.log("Generated access token", accessToken);
 
-    return response.json({
-      accessToken,
-      username: decoded.username,
+      const accessToken = jwt.sign(
+        { username: decoded.username, userId: decoded.userId },
+        process.env.SECRET,
+        {
+          expiresIn: "1d",
+        }
+      );
+      console.log("Generated access token", accessToken);
+
+      return response.json({
+        accessToken,
+        username: decoded.username,
+      });
     });
-  });
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Google authentication routes
@@ -96,19 +100,50 @@ AuthRouter.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/api/auth/logout" }),
   (req, res) => {
-    res.redirect(`${process.env.FRONTEND_URI}/?token=${req.user.accessToken}`);
+    try {
+      const accessToken = jwt.sign(
+        { username: req.user.username, userId: req.user.id },
+        process.env.SECRET,
+        {
+          expiresIn: "1d",
+        }
+      );
+
+      const refreshToken = jwt.sign(
+        { username: req.user.username, userId: req.user.id },
+        process.env.REFRESH_SECRET,
+        {
+          expiresIn: "7d",
+        }
+      );
+
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "lax",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      res.redirect(`${process.env.FRONTEND_URI}/?token=${accessToken}`);
+    } catch (error) {
+      next(error);
+    }
   }
 );
 
 // Common logout route
 AuthRouter.get("/logout", (req, res, next) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
-    res.clearCookie("refreshToken");
-    res.status(200).json({ message: "Logged out successfully" });
-  });
+  try {
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      }
+      res.clearCookie("refreshToken");
+      res.status(200).json({ message: "Logged out successfully" });
+    });
+  } catch (error) {
+    next(error);
+  }
 });
 
 module.exports = AuthRouter;

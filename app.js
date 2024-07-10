@@ -12,6 +12,7 @@ const {unknownEndpoint, errorHandler, tokenExtracter, userExtracter} = require('
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
 const passport = require('./utils/passport-config');
+const friendsRouter = require('./controllers/friends');
 
 require('dotenv').config();
 require('express-async-errors');  
@@ -52,6 +53,7 @@ if(process.env.NODE_ENV === 'test'){
 app.use('/api/blogs',userExtracter, blogsRouter);
 app.use('/api/users',usersRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/friends', userExtracter, friendsRouter);
 
 app.use(unknownEndpoint);
 app.use(errorHandler);

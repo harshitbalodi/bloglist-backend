@@ -50,7 +50,7 @@ const userExtracter = (request, response, next) => {
   }
   try {
     const decodedToken = jwt.verify(token, process.env.SECRET);
-    info(decodedToken);
+    info("decodedToken",decodedToken);
     if (!decodedToken.username || !decodedToken.userId) {
       return response.status(401).json({error:"Invalid Token!"})
     }
