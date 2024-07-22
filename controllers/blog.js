@@ -1,11 +1,12 @@
+// controllers/blogs.js
 const blogsRouter = require("express").Router();
 const Blog = require("../models/blog");
 const { info } = require("../utils/loggers");
 const User = require("../models/user");
-const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const { userExtracter } = require("../utils/middleware");
 
+// get all the blogs
 blogsRouter.get("/", async (request, response, next) => {
   try {
     const blogs = await Blog.find({}).populate("user", {
@@ -19,31 +20,25 @@ blogsRouter.get("/", async (request, response, next) => {
   }
 });
 
+// get all the comment from the blog id 
 blogsRouter.get("/:id/comments", async (request, response, next) => {
   try {
     const id = request.params.id;
-    console.log(id);
     const blog = await Blog.findById(id);
-    console.log("This is blog", blog);
-    if (!blog) return response.status(404).send("not a valid blog id");
+    if (!blog) return response.status(404).send("Not a valid blog ID");
     response.status(200).json(blog.comments);
   } catch (error) {
-    console.log("error inside get comments", error);
     next(error);
   }
 });
 
+// create a blog
 blogsRouter.post("/", userExtracter, async (request, response, next) => {
   try {
     const resObject = request.body;
     if (!resObject.url || !resObject.title) {
-      console.log(resObject);
-      return response
-        .status(400)
-        .send("url or title is missing in the request object");
+      return response.status(400).send("URL or title is missing in the request object");
     }
-
-    info("user:", request.user);
 
     const user = await User.findById(request.user.userId);
     const blog = new Blog({
@@ -58,79 +53,76 @@ blogsRouter.post("/", userExtracter, async (request, response, next) => {
       username: 1,
       name: 1,
     });
-    info("Blog object", blogObj);
     response.status(201).json(blogObj);
   } catch (error) {
     next(error);
   }
 });
 
-blogsRouter.post(
-  "/:id/comments",
-  userExtracter,
-  async (request, response, next) => {
-    try {
-      console.log(request.body);
-      const { comment } = request.body;
-      const id = request.params.id;
-      const blog = await Blog.findById(id);
-      if (!blog) return response.status(404).send("invalid blog id");
-      blog.comments = blog.comments.concat(comment);
-      await Blog.findByIdAndUpdate(id,blog);
-      const newBlog =await Blog.findById(id);
-      console.log(newBlog);
-      return response.status(201).json(newBlog);
-    } catch (error) {
-      console.log(error);
-      next(error);
-    }
+// comment in a blog
+blogsRouter.post("/:id/comments", userExtracter, async (request, response, next) => {
+  try {
+    const { comment } = request.body;
+    const id = request.params.id;
+    const blog = await Blog.findById(id);
+    if (!blog) return response.status(404).send("Invalid blog ID");
+    blog.comments = blog.comments.concat(comment);
+    await Blog.findByIdAndUpdate(id, blog);
+    const newBlog = await Blog.findById(id);
+    return response.status(201).json(newBlog);
+  } catch (error) {
+    next(error);
   }
-);
+});
 
+// delete a blog
 blogsRouter.delete("/:id", userExtracter, async (request, response, next) => {
   try {
     const id = request.params.id;
     const blog = await Blog.findById(new mongoose.Types.ObjectId(id));
-    info("blog", blog);
     if (!blog) {
       return response.status(404).send("Blog is already deleted");
     }
 
     const user = await User.findById(blog.user);
-    info("user:", user);
-
     if (request.user.userId !== user.id) {
-      return response
-        .status(403)
-        .send("not a valid user to perform this operation");
+      return response.status(403).send("Not a valid user to perform this operation");
     }
 
     user.blogs = user.blogs.filter((blogId) => blogId.toString() !== id);
-    info("user.blog", user.blogs);
-    const ressave = await user.save();
-    info("res-save:", ressave);
-    const res = await Blog.findByIdAndDelete(blog._id);
-    info("res from delete operartion:", res);
-    response.status(204).send("blog is deleted");
+    await user.save();
+    await Blog.findByIdAndDelete(blog._id);
+    response.status(204).send("Blog is deleted");
   } catch (error) {
     next(error);
   }
 });
 
-blogsRouter.put("/:id", async (request, response, next) => {
+// like/unlike a blog
+blogsRouter.put("/:id/like", userExtracter, async (request, response, next) => {
   try {
     const id = request.params.id;
-    const blog = await Blog.findById(id).populate("user", {
-      username: 1,
-      name: 1,
-    });
-    blog.likes = blog.likes + 1;
-    await blog.save();
+    const userId = request.user.userId;
+    
+    const blog = await Blog.findById(id);
+    if (!blog) {
+      return response.status(404).send("Blog not found");
+    }
 
-    response.status(200).send(blog);
+    const alreadyLikedIndex = blog.likes.findIndex(like => like.toString() === userId);
+
+    if (alreadyLikedIndex === -1) {
+      blog.likes.push(userId);
+    } else {
+      blog.likes.splice(alreadyLikedIndex, 1);
+    }
+
+    const updatedBlog = await blog.save();
+    response.status(200).json(updatedBlog);
   } catch (error) {
     next(error);
   }
 });
+
 
 module.exports = blogsRouter;
