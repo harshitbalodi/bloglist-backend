@@ -28,7 +28,7 @@ const userSchema = mongoose.Schema({
   },
   provider: {
     type: String,
-    enum: ["local", "google"],
+    // enum: ["local", "google"],
     required: true,
   },
   blogs: [

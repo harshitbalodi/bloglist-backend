@@ -90,16 +90,19 @@ blogsRouter.delete("/:id", userExtracter, async (request, response, next) => {
     }
 
     user.blogs = user.blogs.filter((blogId) => blogId.toString() !== id);
+    if(!user.provider) {
+      user.provider = 'local';
+    }
     await user.save();
     await Blog.findByIdAndDelete(blog._id);
-    response.status(204).send("Blog is deleted");
+    response.status(204).send();
   } catch (error) {
     next(error);
   }
 });
 
 // like/unlike a blog
-blogsRouter.put("/:id/like", userExtracter, async (request, response, next) => {
+blogsRouter.put("/like/:id", userExtracter, async (request, response, next) => {
   try {
     const id = request.params.id;
     const userId = request.user.userId;
@@ -107,6 +110,9 @@ blogsRouter.put("/:id/like", userExtracter, async (request, response, next) => {
     const blog = await Blog.findById(id);
     if (!blog) {
       return response.status(404).send("Blog not found");
+    }
+    if(!blog.likes){
+      blog.likes = [];
     }
 
     const alreadyLikedIndex = blog.likes.findIndex(like => like.toString() === userId);
